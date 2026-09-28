@@ -40,6 +40,7 @@ final class NewHabitViewController: UIViewController {
     // MARK: - Private Properties
 
     private var schedule: [WeekDay] = []
+    private var buttonsBottomConstraint: NSLayoutConstraint!
 
     private var isCreateButtonEnabled: Bool {
         let isNameFilled = !(nameTextField.text ?? "").trimmingCharacters(in: .whitespaces).isEmpty
@@ -181,6 +182,11 @@ final class NewHabitViewController: UIViewController {
     }
 
     private func setupConstraints() {
+        buttonsBottomConstraint = buttonsStackView.bottomAnchor.constraint(
+            equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+            constant: -16
+        )
+
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -206,7 +212,7 @@ final class NewHabitViewController: UIViewController {
 
             buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sideInset),
             buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sideInset),
-            buttonsStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            buttonsBottomConstraint,
             buttonsStackView.heightAnchor.constraint(equalToConstant: Constants.buttonHeight)
         ])
     }
@@ -238,14 +244,20 @@ final class NewHabitViewController: UIViewController {
 
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-        let keyboardHeight = keyboardFrame.cgRectValue.height
-        scrollView.contentInset.bottom = keyboardHeight
-        scrollView.verticalScrollIndicatorInsets.bottom = keyboardHeight
+        let keyboardHeight = keyboardFrame.cgRectValue.height - view.safeAreaInsets.bottom
+        animateButtonsBottomConstraint(to: -(16 + max(0, keyboardHeight)), notification: notification)
     }
 
-    @objc private func keyboardWillHide() {
-        scrollView.contentInset.bottom = 0
-        scrollView.verticalScrollIndicatorInsets.bottom = 0
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        animateButtonsBottomConstraint(to: -16, notification: notification)
+    }
+
+    private func animateButtonsBottomConstraint(to constant: CGFloat, notification: Notification) {
+        let duration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval) ?? 0.25
+        buttonsBottomConstraint.constant = constant
+        UIView.animate(withDuration: duration) {
+            self.view.layoutIfNeeded()
+        }
     }
 
     private func updateCreateButtonState() {

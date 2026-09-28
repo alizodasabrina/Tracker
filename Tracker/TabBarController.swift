@@ -14,8 +14,8 @@ final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let unselectedColor = UIColor(named: "ypGray") ?? .gray
-        let selectedColor = UIColor(named: "ypBlue") ?? .systemBlue
+        let unselectedColor = UIColor(resource: .ypGray)
+        let selectedColor = UIColor(resource: .ypBlue)
 
         let trackersViewController = TrackersViewController()
         trackersViewController.tabBarItem = UITabBarItem(
@@ -28,8 +28,8 @@ final class TabBarController: UITabBarController {
         let statisticsViewController = StatisticsViewController()
         statisticsViewController.tabBarItem = UITabBarItem(
             title: "Статистика",
-            image: UIImage(named: "tab_statistics")?.withTintColor(unselectedColor, renderingMode: .alwaysOriginal),
-            selectedImage: UIImage(named: "tab_statistics")?.withTintColor(selectedColor, renderingMode: .alwaysOriginal)
+            image: UIImage(resource: .tabStatistics).withTintColor(unselectedColor, renderingMode: .alwaysOriginal),
+            selectedImage: UIImage(resource: .tabStatistics).withTintColor(selectedColor, renderingMode: .alwaysOriginal)
         )
 
         viewControllers = [trackersNavigationController, statisticsViewController]

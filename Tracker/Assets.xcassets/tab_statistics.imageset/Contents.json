@@ -1,11 +1,6 @@
 {
   "images" : [
     {
-      "filename" : "tab_statistics.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
       "filename" : "tab_statistics@2x.png",
       "idiom" : "universal",
       "scale" : "2x"

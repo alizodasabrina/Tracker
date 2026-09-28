@@ -1,11 +1,6 @@
 {
   "images" : [
     {
-      "filename" : "add_tracker.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
       "filename" : "add_tracker@2x.png",
       "idiom" : "universal",
       "scale" : "2x"

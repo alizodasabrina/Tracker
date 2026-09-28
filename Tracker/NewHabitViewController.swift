@@ -48,10 +48,9 @@ final class NewHabitViewController: UIViewController {
 
     private var scheduleSubtitle: String? {
         guard !schedule.isEmpty else { return nil }
-        if schedule.count == WeekDay.allCases.count {
-            return "Каждый день"
-        }
-        return schedule.map(\.shortTitle).joined(separator: ", ")
+        return schedule.count == WeekDay.allCases.count
+            ? "Каждый день"
+            : schedule.map(\.shortTitle).joined(separator: ", ")
     }
 
     // MARK: - Subviews

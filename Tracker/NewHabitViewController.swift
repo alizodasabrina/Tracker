@@ -144,7 +144,6 @@ final class NewHabitViewController: UIViewController {
         setupKeyboardDismissRecognizer()
         subscribeToKeyboardNotifications()
         updateCreateButtonState()
-        nameTextField.becomeFirstResponder()
     }
 
     // MARK: - Actions

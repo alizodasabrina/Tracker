@@ -8,7 +8,7 @@
 import Foundation
 
 // rawValue как у Calendar.weekday - воскресенье = 1, чтобы не пересчитывать вручную
-enum WeekDay: Int, CaseIterable {
+enum WeekDay: Int, CaseIterable, Codable {
     case sunday = 1
     case monday
     case tuesday

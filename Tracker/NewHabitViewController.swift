@@ -10,7 +10,7 @@ import UIKit
 // MARK: - NewHabitViewControllerDelegate
 
 protocol NewHabitViewControllerDelegate: AnyObject {
-    func newHabitViewController(_ viewController: NewHabitViewController, didCreate tracker: Tracker)
+    func newHabitViewController(_ viewController: NewHabitViewController, didCreate tracker: Tracker, categoryTitle: String)
 }
 
 // MARK: - NewHabitViewController
@@ -25,12 +25,6 @@ final class NewHabitViewController: UIViewController {
         static let buttonHeight: CGFloat = 60
         static let cornerRadius: CGFloat = 16
         static let optionCellReuseIdentifier = "optionCell"
-        static let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
-        static let colors: [UIColor] = [
-            .colorSelection1, .colorSelection2, .colorSelection3, .colorSelection4, .colorSelection5, .colorSelection6,
-            .colorSelection7, .colorSelection8, .colorSelection9, .colorSelection10, .colorSelection11, .colorSelection12,
-            .colorSelection13, .colorSelection14, .colorSelection15, .colorSelection16, .colorSelection17, .colorSelection18
-        ].map { UIColor(resource: $0) }
         static let collectionColumns: CGFloat = 6
         static let collectionSideInset: CGFloat = 18
         static let collectionCellSpacing: CGFloat = 5
@@ -44,26 +38,12 @@ final class NewHabitViewController: UIViewController {
 
     // MARK: - Private Properties
 
-    private var schedule: [WeekDay] = []
-    private var selectedEmojiIndex: Int?
-    private var selectedColorIndex: Int?
-
-    private var isCreateButtonEnabled: Bool {
-        let isNameFilled = !(nameTextField.text ?? "").trimmingCharacters(in: .whitespaces).isEmpty
-        return isNameFilled && !schedule.isEmpty && selectedEmojiIndex != nil && selectedColorIndex != nil
-    }
+    private let viewModel = NewHabitViewModel(categoryStore: TrackerCategoryStore())
 
     private var collectionGridHeight: CGFloat {
         // между рядами зазора нет, только между колонками
-        let rows = ceil(CGFloat(Constants.emojis.count) / Constants.collectionColumns)
+        let rows = ceil(CGFloat(viewModel.emojis.count) / Constants.collectionColumns)
         return rows * Constants.collectionRowHeight
-    }
-
-    private var scheduleSubtitle: String? {
-        guard !schedule.isEmpty else { return nil }
-        return schedule.count == WeekDay.allCases.count
-            ? "Каждый день"
-            : schedule.map(\.shortTitle).joined(separator: ", ")
     }
 
     // MARK: - Subviews
@@ -197,6 +177,7 @@ final class NewHabitViewController: UIViewController {
         setupConstraints()
         setupKeyboardDismissRecognizer()
         subscribeToKeyboardNotifications()
+        bindViewModel()
         updateCreateButtonState()
     }
 
@@ -211,19 +192,12 @@ final class NewHabitViewController: UIViewController {
     }
 
     @objc private func didTapCreateButton() {
-        guard let title = nameTextField.text?.trimmingCharacters(in: .whitespaces), !title.isEmpty,
-              let emojiIndex = selectedEmojiIndex,
-              let colorIndex = selectedColorIndex
+        guard
+            let tracker = viewModel.makeTracker(title: nameTextField.text ?? ""),
+            let categoryTitle = viewModel.selectedCategoryTitle
         else { return }
 
-        let tracker = Tracker(
-            id: UUID(),
-            title: title,
-            color: Constants.colors[colorIndex],
-            emoji: Constants.emojis[emojiIndex],
-            schedule: schedule
-        )
-        delegate?.newHabitViewController(self, didCreate: tracker)
+        delegate?.newHabitViewController(self, didCreate: tracker, categoryTitle: categoryTitle)
     }
 
     // MARK: - Private Methods
@@ -324,9 +298,15 @@ final class NewHabitViewController: UIViewController {
         scrollView.verticalScrollIndicatorInsets.bottom = 0
     }
 
+    private func bindViewModel() {
+        viewModel.onStateChanged = { [weak self] _ in
+            self?.updateCreateButtonState()
+        }
+    }
+
     private func updateCreateButtonState() {
-        createButton.isEnabled = isCreateButtonEnabled
-        createButton.backgroundColor = isCreateButtonEnabled ? UIColor(resource: .ypBlack) : UIColor(resource: .ypGray)
+        createButton.isEnabled = viewModel.isCreateButtonEnabled
+        createButton.backgroundColor = viewModel.isCreateButtonEnabled ? UIColor(resource: .ypBlack) : UIColor(resource: .ypGray)
     }
 }
 
@@ -343,9 +323,17 @@ extension NewHabitViewController: UITextFieldDelegate {
 
 extension NewHabitViewController: ScheduleViewControllerDelegate {
     func scheduleViewController(_ viewController: ScheduleViewController, didSelect schedule: [WeekDay]) {
-        self.schedule = schedule
-        updateCreateButtonState()
+        viewModel.selectSchedule(schedule)
         optionsTableView.reloadRows(at: [IndexPath(row: 1, section: 0)], with: .none)
+    }
+}
+
+// MARK: - CategoryViewControllerDelegate
+
+extension NewHabitViewController: CategoryViewControllerDelegate {
+    func categoryViewController(_ viewController: CategoryViewController, didSelect categoryTitle: String) {
+        viewModel.selectCategory(title: categoryTitle)
+        optionsTableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .none)
     }
 }
 
@@ -361,7 +349,7 @@ extension NewHabitViewController: UITableViewDataSource {
             ?? UITableViewCell(style: .subtitle, reuseIdentifier: Constants.optionCellReuseIdentifier)
         cell.textLabel?.text = optionTitles[indexPath.row]
         cell.textLabel?.font = .systemFont(ofSize: 17)
-        cell.detailTextLabel?.text = indexPath.row == 1 ? scheduleSubtitle : nil
+        cell.detailTextLabel?.text = indexPath.row == 0 ? viewModel.selectedCategoryTitle : viewModel.scheduleSubtitle
         cell.detailTextLabel?.font = .systemFont(ofSize: 17)
         cell.detailTextLabel?.textColor = UIColor(resource: .ypGray)
         cell.backgroundColor = UIColor(resource: .ypBackground)
@@ -387,13 +375,22 @@ extension NewHabitViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
 
         switch indexPath.row {
+        case 0:
+            let categoryViewModel = TrackerCategoryViewModel(
+                categoryStore: viewModel.categoryStore,
+                selectedCategoryTitle: viewModel.selectedCategoryTitle
+            )
+            let categoryViewController = CategoryViewController(viewModel: categoryViewModel)
+            categoryViewController.delegate = self
+            let navigationController = UINavigationController(rootViewController: categoryViewController)
+            present(navigationController, animated: true)
         case 1:
-            let scheduleViewController = ScheduleViewController(selectedDays: Set(schedule))
+            let scheduleViewController = ScheduleViewController(selectedDays: Set(viewModel.schedule))
             scheduleViewController.delegate = self
             let navigationController = UINavigationController(rootViewController: scheduleViewController)
             present(navigationController, animated: true)
         default:
-            break // Экран «Категория» будет реализован в следующих уроках.
+            break
         }
     }
 }
@@ -402,7 +399,7 @@ extension NewHabitViewController: UITableViewDelegate {
 
 extension NewHabitViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        collectionView === emojiCollectionView ? Constants.emojis.count : Constants.colors.count
+        collectionView === emojiCollectionView ? viewModel.emojis.count : viewModel.colors.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -413,8 +410,8 @@ extension NewHabitViewController: UICollectionViewDataSource {
             ) as? EmojiCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            cell.configure(with: Constants.emojis[indexPath.item])
-            cell.isSelected = indexPath.item == selectedEmojiIndex
+            cell.configure(with: viewModel.emojis[indexPath.item])
+            cell.isSelected = indexPath.item == viewModel.selectedEmojiIndex
             return cell
         }
 
@@ -424,8 +421,8 @@ extension NewHabitViewController: UICollectionViewDataSource {
         ) as? ColorCollectionViewCell else {
             return UICollectionViewCell()
         }
-        cell.configure(with: Constants.colors[indexPath.item])
-        cell.isSelected = indexPath.item == selectedColorIndex
+        cell.configure(with: viewModel.colors[indexPath.item])
+        cell.isSelected = indexPath.item == viewModel.selectedColorIndex
         return cell
     }
 }
@@ -435,14 +432,13 @@ extension NewHabitViewController: UICollectionViewDataSource {
 extension NewHabitViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView === emojiCollectionView {
-            selectedEmojiIndex = indexPath.item
+            viewModel.selectEmoji(at: indexPath.item)
         } else {
-            selectedColorIndex = indexPath.item
+            viewModel.selectColor(at: indexPath.item)
         }
         // reloadData сбрасывает isSelected у ячеек, поэтому выбираем заново через selectItem
         collectionView.reloadData()
         collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-        updateCreateButtonState()
     }
 }
 

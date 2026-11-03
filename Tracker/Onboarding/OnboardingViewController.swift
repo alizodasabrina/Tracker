@@ -87,7 +87,8 @@ final class OnboardingViewController: UIPageViewController {
     // MARK: - Actions
 
     @objc private func didTapContinueButton() {
-        switchToTabBarController()
+        OnboardingService.shared.hasSeenOnboarding = true
+        switchToMainScreen()
     }
 
     // MARK: - Private Methods
@@ -109,13 +110,13 @@ final class OnboardingViewController: UIPageViewController {
         ])
     }
 
-    private func switchToTabBarController() {
+    private func switchToMainScreen() {
         guard let window = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .flatMap({ $0.windows })
             .first(where: { $0.isKeyWindow })
         else { return }
-        window.rootViewController = TabBarController()
+        window.showMainScreen()
     }
 }
 

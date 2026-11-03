@@ -9,6 +9,10 @@ import UIKit
 
 final class NewHabitViewModel {
 
+    // MARK: - Constants
+
+    static let nameMaxLength = 38
+
     // MARK: - Bindings
 
     var onStateChanged: Binding<Void>?
@@ -24,6 +28,10 @@ final class NewHabitViewModel {
     ].map { UIColor(resource: $0) }
 
     let categoryStore: TrackerCategoryStore
+
+    private(set) var name: String = "" {
+        didSet { onStateChanged?(()) }
+    }
 
     private(set) var schedule: [WeekDay] = [] {
         didSet { onStateChanged?(()) }
@@ -41,8 +49,17 @@ final class NewHabitViewModel {
         didSet { onStateChanged?(()) }
     }
 
+    var isNameTooLong: Bool {
+        name.count > Self.nameMaxLength
+    }
+
     var isCreateButtonEnabled: Bool {
-        selectedEmojiIndex != nil && selectedColorIndex != nil && selectedCategoryTitle != nil && !schedule.isEmpty
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !isNameTooLong
+            && selectedEmojiIndex != nil
+            && selectedColorIndex != nil
+            && selectedCategoryTitle != nil
+            && !schedule.isEmpty
     }
 
     var scheduleSubtitle: String? {
@@ -60,6 +77,10 @@ final class NewHabitViewModel {
 
     // MARK: - Public Methods
 
+    func setName(_ text: String) {
+        name = text
+    }
+
     func selectEmoji(at index: Int) {
         selectedEmojiIndex = index
     }
@@ -76,10 +97,11 @@ final class NewHabitViewModel {
         schedule = days
     }
 
-    func makeTracker(title: String) -> Tracker? {
-        let normalizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+    func makeTracker() -> Tracker? {
+        let normalizedTitle = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard
             !normalizedTitle.isEmpty,
+            !isNameTooLong,
             let emojiIndex = selectedEmojiIndex,
             let colorIndex = selectedColorIndex
         else {

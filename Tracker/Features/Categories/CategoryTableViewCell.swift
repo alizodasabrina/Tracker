@@ -17,11 +17,7 @@ final class CategoryTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
-        backgroundColor = UIColor(resource: .ypBackground)
-        selectionStyle = .none
-        textLabel?.font = .systemFont(ofSize: 17)
-        textLabel?.textColor = UIColor(resource: .ypBlack)
-        tintColor = UIColor(resource: .ypBlue)
+        setupAppearance()
     }
 
     @available(*, unavailable)
@@ -34,5 +30,15 @@ final class CategoryTableViewCell: UITableViewCell {
     func configure(title: String, isSelected: Bool) {
         textLabel?.text = title
         accessoryType = isSelected ? .checkmark : .none
+    }
+
+    // MARK: - Private Methods
+
+    private func setupAppearance() {
+        backgroundColor = UIColor(resource: .ypBackground)
+        selectionStyle = .none
+        textLabel?.font = .systemFont(ofSize: 17)
+        textLabel?.textColor = UIColor(resource: .ypBlack)
+        tintColor = UIColor(resource: .ypBlue)
     }
 }

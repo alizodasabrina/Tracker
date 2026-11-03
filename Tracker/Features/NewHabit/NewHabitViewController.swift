@@ -30,6 +30,8 @@ final class NewHabitViewController: UIViewController {
         static let collectionCellSpacing: CGFloat = 5
         static let collectionRowHeight: CGFloat = 52
         static let sectionHeaderFontSize: CGFloat = 19
+        static let nameWarningHeight: CGFloat = 32
+        static let nameWarningText = "Ограничение 38 символов"
     }
 
     // MARK: - Public Properties
@@ -62,6 +64,19 @@ final class NewHabitViewController: UIViewController {
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
+
+    private lazy var nameWarningLabel: UILabel = {
+        let label = UILabel()
+        label.text = Constants.nameWarningText
+        label.font = .systemFont(ofSize: 17)
+        label.textColor = UIColor(resource: .ypRed)
+        label.textAlignment = .center
+        label.clipsToBounds = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private lazy var nameWarningHeightConstraint = nameWarningLabel.heightAnchor.constraint(equalToConstant: 0)
 
     private let optionTitles = ["Категория", "Расписание"]
 
@@ -122,10 +137,10 @@ final class NewHabitViewController: UIViewController {
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Отменить", for: .normal)
-        button.setTitleColor(.systemRed, for: .normal)
+        button.setTitleColor(UIColor(resource: .ypRed), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.systemRed.cgColor
+        button.layer.borderColor = UIColor(resource: .ypRed).cgColor
         button.layer.cornerRadius = Constants.cornerRadius
         button.addTarget(self, action: #selector(didTapCancelButton), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -184,7 +199,7 @@ final class NewHabitViewController: UIViewController {
     // MARK: - Actions
 
     @objc private func nameTextFieldChanged() {
-        updateCreateButtonState()
+        viewModel.setName(nameTextField.text ?? "")
     }
 
     @objc private func didTapCancelButton() {
@@ -193,7 +208,7 @@ final class NewHabitViewController: UIViewController {
 
     @objc private func didTapCreateButton() {
         guard
-            let tracker = viewModel.makeTracker(title: nameTextField.text ?? ""),
+            let tracker = viewModel.makeTracker(),
             let categoryTitle = viewModel.selectedCategoryTitle
         else { return }
 
@@ -206,6 +221,7 @@ final class NewHabitViewController: UIViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubview(nameTextField)
+        contentView.addSubview(nameWarningLabel)
         contentView.addSubview(optionsTableView)
         contentView.addSubview(emojiLabel)
         contentView.addSubview(emojiCollectionView)
@@ -232,7 +248,12 @@ final class NewHabitViewController: UIViewController {
             nameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
             nameTextField.heightAnchor.constraint(equalToConstant: Constants.fieldHeight),
 
-            optionsTableView.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 24),
+            nameWarningLabel.topAnchor.constraint(equalTo: nameTextField.bottomAnchor),
+            nameWarningLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
+            nameWarningLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
+            nameWarningHeightConstraint,
+
+            optionsTableView.topAnchor.constraint(equalTo: nameWarningLabel.bottomAnchor, constant: 24),
             optionsTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
             optionsTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
             optionsTableView.heightAnchor.constraint(equalToConstant: Constants.fieldHeight * 2),
@@ -301,12 +322,20 @@ final class NewHabitViewController: UIViewController {
     private func bindViewModel() {
         viewModel.onStateChanged = { [weak self] _ in
             self?.updateCreateButtonState()
+            self?.updateNameWarningVisibility()
         }
     }
 
     private func updateCreateButtonState() {
         createButton.isEnabled = viewModel.isCreateButtonEnabled
         createButton.backgroundColor = viewModel.isCreateButtonEnabled ? UIColor(resource: .ypBlack) : UIColor(resource: .ypGray)
+    }
+
+    private func updateNameWarningVisibility() {
+        let isTooLong = viewModel.isNameTooLong
+        nameWarningLabel.isHidden = !isTooLong
+        nameWarningHeightConstraint.constant = isTooLong ? Constants.nameWarningHeight : 0
+        view.layoutIfNeeded()
     }
 }
 

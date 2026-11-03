@@ -34,9 +34,7 @@ final class ScheduleViewController: UIViewController {
 
     // MARK: - Private Properties
 
-    private var selectedDays: Set<WeekDay>
-    // Отображаем с понедельника, а не в порядке rawValue (там неделя начинается с воскресенья).
-    private let weekDays: [WeekDay] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
+    private let viewModel: ScheduleViewModel
 
     // MARK: - Subviews
 
@@ -68,7 +66,7 @@ final class ScheduleViewController: UIViewController {
     // MARK: - Init
 
     init(selectedDays: Set<WeekDay> = []) {
-        self.selectedDays = selectedDays
+        self.viewModel = ScheduleViewModel(selectedDays: selectedDays)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -91,18 +89,13 @@ final class ScheduleViewController: UIViewController {
     // MARK: - Actions
 
     @objc private func didTapDoneButton() {
-        let orderedSchedule = weekDays.filter { selectedDays.contains($0) }
-        delegate?.scheduleViewController(self, didSelect: orderedSchedule)
+        delegate?.scheduleViewController(self, didSelect: viewModel.orderedSelectedDays)
         dismiss(animated: true)
     }
 
     @objc private func switchChanged(_ sender: UISwitch) {
-        guard let day = weekDays[safe: sender.tag] else { return }
-        if sender.isOn {
-            selectedDays.insert(day)
-        } else {
-            selectedDays.remove(day)
-        }
+        guard let day = viewModel.weekDays[safe: sender.tag] else { return }
+        viewModel.setDay(day, isSelected: sender.isOn)
     }
 
     // MARK: - Private Methods
@@ -117,7 +110,7 @@ final class ScheduleViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sideInset),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sideInset),
-            tableView.heightAnchor.constraint(equalToConstant: Constants.rowHeight * CGFloat(weekDays.count)),
+            tableView.heightAnchor.constraint(equalToConstant: Constants.rowHeight * CGFloat(viewModel.weekDays.count)),
 
             doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sideInset),
             doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sideInset),
@@ -132,12 +125,12 @@ final class ScheduleViewController: UIViewController {
 
 extension ScheduleViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weekDays.count
+        viewModel.weekDays.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.reuseIdentifier, for: indexPath)
-        let day = weekDays[indexPath.row]
+        let day = viewModel.weekDays[indexPath.row]
 
         cell.textLabel?.text = day.title
         cell.selectionStyle = .none
@@ -145,12 +138,12 @@ extension ScheduleViewController: UITableViewDataSource {
 
         let daySwitch = UISwitch()
         daySwitch.tag = indexPath.row
-        daySwitch.isOn = selectedDays.contains(day)
+        daySwitch.isOn = viewModel.isDaySelected(day)
         daySwitch.onTintColor = UIColor(resource: .ypBlue)
         daySwitch.addTarget(self, action: #selector(switchChanged), for: .valueChanged)
         cell.accessoryView = daySwitch
 
-        if indexPath.row == weekDays.count - 1 {
+        if indexPath.row == viewModel.weekDays.count - 1 {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
         }
 

@@ -34,6 +34,11 @@ final class TabBarController: UITabBarController {
 
         viewControllers = [trackersNavigationController, statisticsViewController]
 
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+
         tabBar.tintColor = selectedColor
         tabBar.unselectedItemTintColor = unselectedColor
 

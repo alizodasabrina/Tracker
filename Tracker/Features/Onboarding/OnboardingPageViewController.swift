@@ -14,7 +14,7 @@ final class OnboardingPageViewController: UIViewController {
     private enum Constants {
         static let titleFontSize: CGFloat = 32
         static let titleSideInset: CGFloat = 16
-        static let titleBottomInset: CGFloat = 160
+        static let titleBottomInset: CGFloat = 270
     }
 
     // MARK: - Private Properties

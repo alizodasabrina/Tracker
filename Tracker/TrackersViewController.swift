@@ -43,6 +43,10 @@ final class TrackersViewController: UIViewController {
     private let defaultCategoryTitle = "Важное"
     private var searchText: String = ""
 
+    private let categoryStore = TrackerCategoryStore()
+    private let trackerStore = TrackerStore()
+    private let recordStore = TrackerRecordStore()
+
     private var visibleCategories: [TrackerCategory] {
         guard let weekDay = WeekDay(rawValue: Calendar.current.component(.weekday, from: currentDate)) else {
             return []
@@ -119,11 +123,13 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .white
+        categoryStore.delegate = self
+        recordStore.delegate = self
         setupNavigationBar()
         setupView()
         setupConstraints()
         setupCollectionView()
-        updatePlaceholderVisibility()
+        reloadFromStores()
     }
 
     // MARK: - Actions
@@ -203,20 +209,21 @@ final class TrackersViewController: UIViewController {
         completedTrackersSet.contains(TrackerRecord(trackerId: trackerId, date: currentDate))
     }
 
-    // Tracker и TrackerCategory - структуры с let, поэтому просто пересобираем массивы заново
-    private func addTracker(_ tracker: Tracker) {
-        if let index = categories.firstIndex(where: { $0.title == defaultCategoryTitle }) {
-            let updatedTrackers = categories[index].trackers + [tracker]
-            let updatedCategory = TrackerCategory(title: defaultCategoryTitle, trackers: updatedTrackers)
-            var updatedCategories = categories
-            updatedCategories[index] = updatedCategory
-            categories = updatedCategories
-        } else {
-            categories = categories + [TrackerCategory(title: defaultCategoryTitle, trackers: [tracker])]
-        }
-
+    private func reloadFromStores() {
+        categories = categoryStore.categories
+        completedTrackers = recordStore.records
         collectionView.reloadData()
         updatePlaceholderVisibility()
+    }
+
+    private func addTracker(_ tracker: Tracker) {
+        do {
+            let category = try categoryStore.categoryCoreData(withTitle: defaultCategoryTitle)
+                ?? (try categoryStore.addNewCategory(TrackerCategory(title: defaultCategoryTitle, trackers: [])))
+            try trackerStore.addNewTracker(tracker, to: category)
+        } catch {
+            assertionFailure("Не удалось сохранить трекер: \(error)")
+        }
     }
 
     private func completedDaysCount(trackerId: UUID) -> Int {
@@ -332,16 +339,14 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func trackerCell(_ cell: TrackerCollectionViewCell, didTapCompleteButtonFor trackerId: UUID) {
         guard isCompletionEnabled() else { return }
 
-        if let index = completedTrackers.firstIndex(where: {
-            $0.trackerId == trackerId && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
-        }) {
-            completedTrackers.remove(at: index)
-        } else {
-            completedTrackers.append(TrackerRecord(trackerId: trackerId, date: currentDate))
-        }
-
-        if let indexPath = collectionView.indexPath(for: cell) {
-            collectionView.reloadItems(at: [indexPath])
+        do {
+            if isCompletedToday(trackerId: trackerId) {
+                try recordStore.deleteRecord(trackerId: trackerId, date: currentDate)
+            } else if let trackerCoreData = try trackerStore.trackerCoreData(withId: trackerId) {
+                try recordStore.addNewRecord(TrackerRecord(trackerId: trackerId, date: currentDate), for: trackerCoreData)
+            }
+        } catch {
+            assertionFailure("Не удалось сохранить отметку выполнения: \(error)")
         }
     }
 }
@@ -362,5 +367,21 @@ extension TrackersViewController: UISearchResultsUpdating {
         searchText = searchController.searchBar.text ?? ""
         collectionView.reloadData()
         updatePlaceholderVisibility()
+    }
+}
+
+// MARK: - TrackerCategoryStoreDelegate
+
+extension TrackersViewController: TrackerCategoryStoreDelegate {
+    func storeDidUpdate(_ store: TrackerCategoryStore) {
+        reloadFromStores()
+    }
+}
+
+// MARK: - TrackerRecordStoreDelegate
+
+extension TrackersViewController: TrackerRecordStoreDelegate {
+    func storeDidUpdate(_ store: TrackerRecordStore) {
+        reloadFromStores()
     }
 }

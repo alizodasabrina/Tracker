@@ -29,7 +29,7 @@ final class CategoryViewController: UIViewController {
         static let placeholderImageSize: CGFloat = 80
         static let placeholderSpacing: CGFloat = 8
         static let placeholderFontSize: CGFloat = 12
-        static let placeholderText = "Привычки и события можно\nобъединить по смыслу"
+        static let placeholderText = NSLocalizedString("category_empty_placeholder", comment: "Плейсхолдер пустого списка категорий")
     }
 
     // MARK: - Public Properties
@@ -56,7 +56,7 @@ final class CategoryViewController: UIViewController {
 
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(NSLocalizedString("category_add_button", comment: "Кнопка добавления категории"), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypBlack)
@@ -102,7 +102,7 @@ final class CategoryViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .white
-        title = "Категория"
+        title = NSLocalizedString("option_category", comment: "Заголовок экрана категорий")
         setupView()
         setupConstraints()
         bindViewModel()

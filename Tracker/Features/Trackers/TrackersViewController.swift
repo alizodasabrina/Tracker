@@ -21,8 +21,8 @@ final class TrackersViewController: UIViewController {
         static let cellHeightRatio: CGFloat = 0.88
         static let headerHeight: CGFloat = 47
         static let reuseIdentifier = "cell"
-        static let emptyPlaceholderText = "Что будем отслеживать?"
-        static let noResultsPlaceholderText = "Ничего не найдено"
+        static let emptyPlaceholderText = NSLocalizedString("trackers_empty_placeholder", comment: "Плейсхолдер пустого списка трекеров")
+        static let noResultsPlaceholderText = NSLocalizedString("trackers_no_results_placeholder", comment: "Плейсхолдер при отсутствии результатов поиска")
     }
 
     // MARK: - Private Properties
@@ -60,7 +60,7 @@ final class TrackersViewController: UIViewController {
         let controller = UISearchController(searchResultsController: nil)
         controller.obscuresBackgroundDuringPresentation = false
         controller.searchResultsUpdater = self
-        controller.searchBar.placeholder = "Поиск"
+        controller.searchBar.placeholder = NSLocalizedString("trackers_search_placeholder", comment: "Плейсхолдер поля поиска")
         return controller
     }()
 
@@ -118,7 +118,7 @@ final class TrackersViewController: UIViewController {
     // MARK: - Private Methods
 
     private func setupNavigationBar() {
-        title = "Трекеры"
+        title = NSLocalizedString("tab_trackers", comment: "Заголовок экрана трекеров")
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.leftBarButtonItem = addButton
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)

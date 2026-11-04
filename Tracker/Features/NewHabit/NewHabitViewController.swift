@@ -31,7 +31,7 @@ final class NewHabitViewController: UIViewController {
         static let collectionRowHeight: CGFloat = 52
         static let sectionHeaderFontSize: CGFloat = 19
         static let nameWarningHeight: CGFloat = 32
-        static let nameWarningText = "Ограничение 38 символов"
+        static let nameWarningText = NSLocalizedString("new_habit_name_warning", comment: "Предупреждение о превышении лимита символов")
     }
 
     // MARK: - Public Properties
@@ -52,7 +52,7 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("new_habit_name_placeholder", comment: "Плейсхолдер поля названия трекера")
         textField.backgroundColor = UIColor(resource: .ypBackground)
         textField.layer.cornerRadius = Constants.cornerRadius
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: Constants.sideInset, height: 0))
@@ -78,7 +78,10 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var nameWarningHeightConstraint = nameWarningLabel.heightAnchor.constraint(equalToConstant: 0)
 
-    private let optionTitles = ["Категория", "Расписание"]
+    private let optionTitles = [
+        NSLocalizedString("option_category", comment: "Строка «Категория» в форме трекера"),
+        NSLocalizedString("option_schedule", comment: "Строка «Расписание» в форме трекера")
+    ]
 
     private lazy var optionsTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
@@ -94,7 +97,7 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
-        label.text = "Emoji"
+        label.text = NSLocalizedString("new_habit_emoji_title", comment: "Заголовок секции эмодзи")
         label.font = .boldSystemFont(ofSize: Constants.sectionHeaderFontSize)
         label.textColor = UIColor(resource: .ypBlack)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -115,7 +118,7 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var colorLabel: UILabel = {
         let label = UILabel()
-        label.text = "Цвет"
+        label.text = NSLocalizedString("new_habit_color_title", comment: "Заголовок секции цвета")
         label.font = .boldSystemFont(ofSize: Constants.sectionHeaderFontSize)
         label.textColor = UIColor(resource: .ypBlack)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -136,7 +139,7 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("new_habit_cancel_button", comment: "Кнопка отмены создания трекера"), for: .normal)
         button.setTitleColor(UIColor(resource: .ypRed), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.borderWidth = 1
@@ -149,7 +152,7 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("new_habit_create_button", comment: "Кнопка создания трекера"), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypGray)
@@ -187,7 +190,7 @@ final class NewHabitViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .white
-        title = "Новая привычка"
+        title = NSLocalizedString("new_habit_title", comment: "Заголовок экрана создания трекера")
         setupView()
         setupConstraints()
         setupKeyboardDismissRecognizer()

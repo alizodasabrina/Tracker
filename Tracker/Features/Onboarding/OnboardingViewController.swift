@@ -23,11 +23,11 @@ final class OnboardingViewController: UIPageViewController {
 
     private lazy var pages: [UIViewController] = [
         OnboardingPageViewController(
-            title: "Отслеживайте только то, что хотите",
+            title: NSLocalizedString("onboarding_page1_title", comment: "Заголовок первой страницы онбординга"),
             backgroundImageName: "onboarding_page1"
         ),
         OnboardingPageViewController(
-            title: "Даже если это не литры воды и йога",
+            title: NSLocalizedString("onboarding_page2_title", comment: "Заголовок второй страницы онбординга"),
             backgroundImageName: "onboarding_page2"
         )
     ]
@@ -47,7 +47,7 @@ final class OnboardingViewController: UIPageViewController {
 
     private lazy var continueButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(NSLocalizedString("onboarding_continue_button", comment: "Кнопка завершения онбординга"), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypBlack)

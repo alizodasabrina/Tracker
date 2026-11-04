@@ -65,7 +65,7 @@ final class NewHabitViewModel {
     var scheduleSubtitle: String? {
         guard !schedule.isEmpty else { return nil }
         return schedule.count == WeekDay.allCases.count
-            ? "Каждый день"
+            ? NSLocalizedString("schedule_every_day", comment: "Подпись расписания, когда выбраны все дни недели")
             : schedule.map(\.shortTitle).joined(separator: ", ")
     }
 

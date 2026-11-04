@@ -28,7 +28,7 @@ final class NewCategoryViewController: UIViewController {
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
         textField.attributedPlaceholder = NSAttributedString(
-            string: "Введите название категории",
+            string: NSLocalizedString("new_category_name_placeholder", comment: "Плейсхолдер поля названия категории"),
             attributes: [.foregroundColor: UIColor(resource: .ypGray)]
         )
         textField.backgroundColor = UIColor(resource: .ypBackground)
@@ -45,7 +45,7 @@ final class NewCategoryViewController: UIViewController {
 
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("new_category_done_button", comment: "Кнопка сохранения новой категории"), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypGray)
@@ -74,7 +74,7 @@ final class NewCategoryViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .white
-        title = "Новая категория"
+        title = NSLocalizedString("new_category_title", comment: "Заголовок экрана создания категории")
         navigationItem.hidesBackButton = true
         setupView()
         setupConstraints()

@@ -19,7 +19,7 @@ final class TabBarController: UITabBarController {
 
         let trackersViewController = TrackersViewController()
         trackersViewController.tabBarItem = UITabBarItem(
-            title: "Трекеры",
+            title: NSLocalizedString("tab_trackers", comment: "Название вкладки с трекерами"),
             image: UIImage(systemName: "record.circle.fill")?.withTintColor(unselectedColor, renderingMode: .alwaysOriginal),
             selectedImage: UIImage(systemName: "record.circle.fill")?.withTintColor(selectedColor, renderingMode: .alwaysOriginal)
         )
@@ -27,7 +27,7 @@ final class TabBarController: UITabBarController {
 
         let statisticsViewController = StatisticsViewController()
         statisticsViewController.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: NSLocalizedString("tab_statistics", comment: "Название вкладки со статистикой"),
             image: UIImage(resource: .tabStatistics).withTintColor(unselectedColor, renderingMode: .alwaysOriginal),
             selectedImage: UIImage(resource: .tabStatistics).withTintColor(selectedColor, renderingMode: .alwaysOriginal)
         )

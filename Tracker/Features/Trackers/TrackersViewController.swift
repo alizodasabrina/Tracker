@@ -23,6 +23,10 @@ final class TrackersViewController: UIViewController {
         static let reuseIdentifier = "cell"
         static let emptyPlaceholderText = NSLocalizedString("trackers_empty_placeholder", comment: "Плейсхолдер пустого списка трекеров")
         static let noResultsPlaceholderText = NSLocalizedString("trackers_no_results_placeholder", comment: "Плейсхолдер при отсутствии результатов поиска")
+        static let filtersButtonWidth: CGFloat = 114
+        static let filtersButtonHeight: CGFloat = 50
+        static let filtersButtonCornerRadius: CGFloat = 16
+        static let filtersButtonBottomInset: CGFloat = 16
     }
 
     // MARK: - Private Properties
@@ -88,6 +92,19 @@ final class TrackersViewController: UIViewController {
         return label
     }()
 
+    // TODO: цвет фона кнопки «Фильтры» (ypBlue) не сверен с Figma в этой сессии — лимит инструмента; проверить при следующем доступе.
+    private lazy var filtersButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle(NSLocalizedString("filters_title", comment: "Заголовок/кнопка фильтров"), for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        button.backgroundColor = UIColor(resource: .ypBlue)
+        button.layer.cornerRadius = Constants.filtersButtonCornerRadius
+        button.addTarget(self, action: #selector(didTapFiltersButton), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -147,6 +164,13 @@ final class TrackersViewController: UIViewController {
         viewModel.setCurrentDate(datePicker.date)
     }
 
+    @objc private func didTapFiltersButton() {
+        let filterViewController = FilterViewController(currentFilter: viewModel.currentFilter)
+        filterViewController.delegate = self
+        let navigationController = UINavigationController(rootViewController: filterViewController)
+        present(navigationController, animated: true)
+    }
+
     // MARK: - Private Methods
 
     private func setupNavigationBar() {
@@ -162,6 +186,7 @@ final class TrackersViewController: UIViewController {
         view.addSubview(collectionView)
         view.addSubview(placeholderImageView)
         view.addSubview(placeholderLabel)
+        view.addSubview(filtersButton)
     }
 
     private func setupConstraints() {
@@ -177,7 +202,12 @@ final class TrackersViewController: UIViewController {
             placeholderImageView.heightAnchor.constraint(equalToConstant: Constants.placeholderImageSize),
 
             placeholderLabel.topAnchor.constraint(equalTo: placeholderImageView.bottomAnchor, constant: Constants.placeholderSpacing),
-            placeholderLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            placeholderLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            filtersButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filtersButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Constants.filtersButtonBottomInset),
+            filtersButton.widthAnchor.constraint(equalToConstant: Constants.filtersButtonWidth),
+            filtersButton.heightAnchor.constraint(equalToConstant: Constants.filtersButtonHeight)
         ])
     }
 
@@ -205,10 +235,11 @@ final class TrackersViewController: UIViewController {
 
     private func updatePlaceholderVisibility() {
         let isEmpty = viewModel.isEmpty
-        placeholderLabel.text = viewModel.isSearchActive ? Constants.noResultsPlaceholderText : Constants.emptyPlaceholderText
+        placeholderLabel.text = viewModel.isFilteringActive ? Constants.noResultsPlaceholderText : Constants.emptyPlaceholderText
         placeholderImageView.isHidden = !isEmpty
         placeholderLabel.isHidden = !isEmpty
         collectionView.isHidden = isEmpty
+        filtersButton.isHidden = !viewModel.isFilterButtonVisible
     }
 }
 
@@ -353,6 +384,14 @@ extension TrackersViewController: NewHabitViewControllerDelegate {
     func newHabitViewController(_ viewController: NewHabitViewController, didSave tracker: Tracker, categoryTitle: String) {
         viewModel.saveTracker(tracker, categoryTitle: categoryTitle)
         viewController.dismiss(animated: true)
+    }
+}
+
+// MARK: - FilterViewControllerDelegate
+
+extension TrackersViewController: FilterViewControllerDelegate {
+    func filterViewController(_ viewController: FilterViewController, didSelect filter: TrackerFilter) {
+        viewModel.setFilter(filter)
     }
 }
 

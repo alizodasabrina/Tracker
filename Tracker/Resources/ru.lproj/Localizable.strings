@@ -16,6 +16,11 @@
 "tracker_delete_confirm_message" = "Уверены что хотите удалить трекер?";
 "tracker_delete_confirm_delete" = "Удалить";
 "tracker_delete_confirm_cancel" = "Отменить";
+"filters_title" = "Фильтры";
+"filter_all" = "Все трекеры";
+"filter_today" = "Трекеры на сегодня";
+"filter_completed" = "Завершённые";
+"filter_incomplete" = "Незавершённые";
 
 /* Общие строки формы привычки/категории */
 "option_category" = "Категория";

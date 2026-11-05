@@ -22,6 +22,16 @@ final class TrackersViewModel {
     var sectionsCount: Int { visibleCategories.count }
     var isEmpty: Bool { visibleCategories.isEmpty }
     var isSearchActive: Bool { !searchText.isEmpty }
+    var isFilteringActive: Bool { isSearchActive || currentFilter == .completed || currentFilter == .incomplete }
+
+    private(set) var currentFilter: TrackerFilter = .all {
+        didSet { onDataChanged?(()) }
+    }
+
+    var isFilterButtonVisible: Bool {
+        guard let weekDay = WeekDay(rawValue: Calendar.current.component(.weekday, from: currentDate)) else { return false }
+        return categories.contains { category in category.trackers.contains { $0.schedule.contains(weekDay) } }
+    }
 
     var isCompletionEnabled: Bool {
         Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) != .orderedDescending
@@ -51,7 +61,16 @@ final class TrackersViewModel {
                 let matchesSchedule = tracker.schedule.contains(weekDay)
                 let matchesSearch = searchText.isEmpty
                     || tracker.title.localizedCaseInsensitiveContains(searchText)
-                return matchesSchedule && matchesSearch
+                let matchesFilter: Bool
+                switch currentFilter {
+                case .all, .today:
+                    matchesFilter = true
+                case .completed:
+                    matchesFilter = isCompletedToday(trackerId: tracker.id)
+                case .incomplete:
+                    matchesFilter = !isCompletedToday(trackerId: tracker.id)
+                }
+                return matchesSchedule && matchesSearch && matchesFilter
             }
             return trackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: trackers)
         }
@@ -97,6 +116,16 @@ final class TrackersViewModel {
     func setSearchText(_ text: String) {
         searchText = text
         onDataChanged?(())
+    }
+
+    func setFilter(_ filter: TrackerFilter) {
+        switch filter {
+        case .today:
+            currentFilter = .all
+            currentDate = Date()
+        case .all, .completed, .incomplete:
+            currentFilter = filter
+        }
     }
 
     func saveTracker(_ tracker: Tracker, categoryTitle: String) {

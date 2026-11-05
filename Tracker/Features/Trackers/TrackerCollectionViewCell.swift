@@ -80,7 +80,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     private lazy var counterLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: Constants.counterFontSize, weight: .medium)
-        label.textColor = UIColor(resource: .ypBlack)
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

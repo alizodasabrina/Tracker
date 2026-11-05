@@ -56,7 +56,7 @@ final class TrackersViewController: UIViewController {
             target: self,
             action: #selector(didTapAddButton)
         )
-        button.tintColor = UIColor(resource: .ypBlack)
+        button.tintColor = .label
         return button
     }()
 
@@ -71,7 +71,7 @@ final class TrackersViewController: UIViewController {
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .systemBackground
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -86,7 +86,7 @@ final class TrackersViewController: UIViewController {
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: Constants.placeholderFontSize, weight: .medium)
-        label.textColor = UIColor(resource: .ypBlack)
+        label.textColor = .label
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -110,7 +110,7 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         setupNavigationBar()
         setupView()
         setupConstraints()

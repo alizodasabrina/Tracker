@@ -22,7 +22,7 @@ final class TrackerSectionHeaderView: UICollectionReusableView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: 19)
-        label.textColor = UIColor(resource: .ypBlack)
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

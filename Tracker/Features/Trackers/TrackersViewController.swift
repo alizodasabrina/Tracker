@@ -93,7 +93,6 @@ final class TrackersViewController: UIViewController {
         return label
     }()
 
-    // TODO: цвет фона кнопки «Фильтры» (ypBlue) не сверен с Figma в этой сессии — лимит инструмента; проверить при следующем доступе.
     private lazy var filtersButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(NSLocalizedString("filters_title", comment: "Заголовок/кнопка фильтров"), for: .normal)

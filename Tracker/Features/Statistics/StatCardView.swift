@@ -19,9 +19,13 @@ final class StatCardView: UIView {
         static let titleFontSize: CGFloat = 12
     }
 
+    // MARK: - Private Properties
+
+    private let gradientBorderLayer = CAGradientLayer()
+    private let gradientMaskLayer = CAShapeLayer()
+
     // MARK: - Subviews
 
-    // TODO: цвет рамки временный (ypGray) — не смогла свериться с Figma, упёрлась в лимит инструмента.
     private lazy var valueLabel: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: Constants.valueFontSize)
@@ -43,8 +47,7 @@ final class StatCardView: UIView {
     init() {
         super.init(frame: .zero)
         layer.cornerRadius = Constants.cornerRadius
-        layer.borderWidth = Constants.borderWidth
-        layer.borderColor = UIColor(resource: .ypGray).cgColor
+        setupGradientBorder()
         setupView()
         setupConstraints()
     }
@@ -52,6 +55,17 @@ final class StatCardView: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         nil
+    }
+
+    // MARK: - Lifecycle
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientBorderLayer.frame = bounds
+        gradientMaskLayer.path = UIBezierPath(
+            roundedRect: bounds.insetBy(dx: Constants.borderWidth / 2, dy: Constants.borderWidth / 2),
+            cornerRadius: Constants.cornerRadius
+        ).cgPath
     }
 
     // MARK: - Public Methods
@@ -62,6 +76,23 @@ final class StatCardView: UIView {
     }
 
     // MARK: - Private Methods
+
+    private func setupGradientBorder() {
+        gradientBorderLayer.colors = [
+            UIColor(resource: .ypRed).cgColor,
+            UIColor(resource: .ypGreen).cgColor,
+            UIColor(resource: .ypBlue).cgColor
+        ]
+        gradientBorderLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientBorderLayer.endPoint = CGPoint(x: 1, y: 0.5)
+
+        gradientMaskLayer.fillColor = UIColor.clear.cgColor
+        gradientMaskLayer.strokeColor = UIColor.black.cgColor
+        gradientMaskLayer.lineWidth = Constants.borderWidth
+        gradientBorderLayer.mask = gradientMaskLayer
+
+        layer.addSublayer(gradientBorderLayer)
+    }
 
     private func setupView() {
         addSubview(valueLabel)

@@ -31,8 +31,9 @@ final class TabBarController: UITabBarController {
             image: UIImage(resource: .tabStatistics).withTintColor(unselectedColor, renderingMode: .alwaysOriginal),
             selectedImage: UIImage(resource: .tabStatistics).withTintColor(selectedColor, renderingMode: .alwaysOriginal)
         )
+        let statisticsNavigationController = UINavigationController(rootViewController: statisticsViewController)
 
-        viewControllers = [trackersNavigationController, statisticsViewController]
+        viewControllers = [trackersNavigationController, statisticsNavigationController]
 
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()

@@ -10,7 +10,7 @@ import UIKit
 // MARK: - NewHabitViewControllerDelegate
 
 protocol NewHabitViewControllerDelegate: AnyObject {
-    func newHabitViewController(_ viewController: NewHabitViewController, didCreate tracker: Tracker, categoryTitle: String)
+    func newHabitViewController(_ viewController: NewHabitViewController, didSave tracker: Tracker, categoryTitle: String)
 }
 
 // MARK: - NewHabitViewController
@@ -32,6 +32,11 @@ final class NewHabitViewController: UIViewController {
         static let sectionHeaderFontSize: CGFloat = 19
         static let nameWarningHeight: CGFloat = 32
         static let nameWarningText = NSLocalizedString("new_habit_name_warning", comment: "Предупреждение о превышении лимита символов")
+        static let daysCountRowHeight: CGFloat = 38
+        static let createTitle = NSLocalizedString("new_habit_title", comment: "Заголовок экрана создания трекера")
+        static let editTitle = "Редактирование привычки"
+        static let createButtonTitle = NSLocalizedString("new_habit_create_button", comment: "Кнопка создания трекера")
+        static let saveButtonTitle = "Сохранить"
     }
 
     // MARK: - Public Properties
@@ -40,7 +45,7 @@ final class NewHabitViewController: UIViewController {
 
     // MARK: - Private Properties
 
-    private let viewModel = NewHabitViewModel(categoryStore: TrackerCategoryStore())
+    private let viewModel: NewHabitViewModel
 
     private var collectionGridHeight: CGFloat {
         // между рядами зазора нет, только между колонками
@@ -48,7 +53,42 @@ final class NewHabitViewController: UIViewController {
         return rows * Constants.collectionRowHeight
     }
 
+    // MARK: - Init
+
+    init(categoryStore: TrackerCategoryStore) {
+        self.viewModel = NewHabitViewModel(categoryStore: categoryStore)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    convenience init() {
+        self.init(categoryStore: TrackerCategoryStore())
+    }
+
+    init(categoryStore: TrackerCategoryStore, editing tracker: Tracker, categoryTitle: String, completedDaysCount: Int) {
+        self.viewModel = NewHabitViewModel(
+            categoryStore: categoryStore,
+            editing: tracker,
+            categoryTitle: categoryTitle,
+            completedDaysCount: completedDaysCount
+        )
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        nil
+    }
+
     // MARK: - Subviews
+
+    private lazy var daysCountLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 32)
+        label.textColor = UIColor(resource: .ypBlack)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
@@ -190,13 +230,21 @@ final class NewHabitViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .white
-        title = NSLocalizedString("new_habit_title", comment: "Заголовок экрана создания трекера")
+        title = viewModel.isEditing ? Constants.editTitle : Constants.createTitle
+        createButton.setTitle(viewModel.isEditing ? Constants.saveButtonTitle : Constants.createButtonTitle, for: .normal)
+        if let completedDaysCount = viewModel.completedDaysCount {
+            daysCountLabel.text = String.localizedStringWithFormat(
+                NSLocalizedString("tracker_days_count", comment: "Количество дней выполнения трекера"),
+                completedDaysCount
+            )
+        }
         setupView()
         setupConstraints()
         setupKeyboardDismissRecognizer()
         subscribeToKeyboardNotifications()
         bindViewModel()
         updateCreateButtonState()
+        preselectEmojiAndColorIfNeeded()
     }
 
     // MARK: - Actions
@@ -215,7 +263,7 @@ final class NewHabitViewController: UIViewController {
             let categoryTitle = viewModel.selectedCategoryTitle
         else { return }
 
-        delegate?.newHabitViewController(self, didCreate: tracker, categoryTitle: categoryTitle)
+        delegate?.newHabitViewController(self, didSave: tracker, categoryTitle: categoryTitle)
     }
 
     // MARK: - Private Methods
@@ -223,6 +271,7 @@ final class NewHabitViewController: UIViewController {
     private func setupView() {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
+        contentView.addSubview(daysCountLabel)
         contentView.addSubview(nameTextField)
         contentView.addSubview(nameWarningLabel)
         contentView.addSubview(optionsTableView)
@@ -246,7 +295,12 @@ final class NewHabitViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
 
-            nameTextField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
+            daysCountLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
+            daysCountLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
+            daysCountLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
+            daysCountLabel.heightAnchor.constraint(equalToConstant: viewModel.isEditing ? Constants.daysCountRowHeight : 0),
+
+            nameTextField.topAnchor.constraint(equalTo: daysCountLabel.bottomAnchor, constant: viewModel.isEditing ? 40 : 24),
             nameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
             nameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
             nameTextField.heightAnchor.constraint(equalToConstant: Constants.fieldHeight),
@@ -339,6 +393,17 @@ final class NewHabitViewController: UIViewController {
         nameWarningLabel.isHidden = !isTooLong
         nameWarningHeightConstraint.constant = isTooLong ? Constants.nameWarningHeight : 0
         view.layoutIfNeeded()
+    }
+
+    private func preselectEmojiAndColorIfNeeded() {
+        guard viewModel.isEditing else { return }
+        nameTextField.text = viewModel.name
+        if let emojiIndex = viewModel.selectedEmojiIndex {
+            emojiCollectionView.selectItem(at: IndexPath(item: emojiIndex, section: 0), animated: false, scrollPosition: [])
+        }
+        if let colorIndex = viewModel.selectedColorIndex {
+            colorCollectionView.selectItem(at: IndexPath(item: colorIndex, section: 0), animated: false, scrollPosition: [])
+        }
     }
 }
 

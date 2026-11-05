@@ -28,6 +28,11 @@ final class NewHabitViewModel {
     ].map { UIColor(resource: $0) }
 
     let categoryStore: TrackerCategoryStore
+    let completedDaysCount: Int?
+
+    var isEditing: Bool { editingTrackerId != nil }
+
+    private let editingTrackerId: UUID?
 
     private(set) var name: String = "" {
         didSet { onStateChanged?(()) }
@@ -73,6 +78,19 @@ final class NewHabitViewModel {
 
     init(categoryStore: TrackerCategoryStore) {
         self.categoryStore = categoryStore
+        self.editingTrackerId = nil
+        self.completedDaysCount = nil
+    }
+
+    init(categoryStore: TrackerCategoryStore, editing tracker: Tracker, categoryTitle: String, completedDaysCount: Int) {
+        self.categoryStore = categoryStore
+        self.editingTrackerId = tracker.id
+        self.completedDaysCount = completedDaysCount
+        self.name = tracker.title
+        self.schedule = tracker.schedule
+        self.selectedEmojiIndex = emojis.firstIndex(of: tracker.emoji)
+        self.selectedColorIndex = colors.firstIndex(where: { $0.isEqual(tracker.color) })
+        self.selectedCategoryTitle = categoryTitle
     }
 
     // MARK: - Public Methods
@@ -109,7 +127,7 @@ final class NewHabitViewModel {
         }
 
         return Tracker(
-            id: UUID(),
+            id: editingTrackerId ?? UUID(),
             title: normalizedTitle,
             color: colors[colorIndex],
             emoji: emojis[emojiIndex],

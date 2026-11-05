@@ -11,6 +11,11 @@
 "trackers_search_placeholder" = "Поиск";
 "trackers_empty_placeholder" = "Что будем отслеживать?";
 "trackers_no_results_placeholder" = "Ничего не найдено";
+"tracker_context_edit" = "Редактировать";
+"tracker_context_delete" = "Удалить";
+"tracker_delete_confirm_message" = "Уверены что хотите удалить трекер?";
+"tracker_delete_confirm_delete" = "Удалить";
+"tracker_delete_confirm_cancel" = "Отменить";
 
 /* Общие строки формы привычки/категории */
 "option_category" = "Категория";

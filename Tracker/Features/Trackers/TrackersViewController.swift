@@ -111,6 +111,38 @@ final class TrackersViewController: UIViewController {
         present(navigationController, animated: true)
     }
 
+    private func presentEditFlow(for tracker: Tracker) {
+        guard let categoryTitle = viewModel.categoryTitle(forTrackerId: tracker.id) else { return }
+        let newHabitViewController = NewHabitViewController(
+            categoryStore: TrackerCategoryStore(),
+            editing: tracker,
+            categoryTitle: categoryTitle,
+            completedDaysCount: viewModel.completedDaysCount(trackerId: tracker.id)
+        )
+        newHabitViewController.delegate = self
+        let navigationController = UINavigationController(rootViewController: newHabitViewController)
+        present(navigationController, animated: true)
+    }
+
+    private func confirmDelete(trackerId: UUID) {
+        let alert = UIAlertController(
+            title: nil,
+            message: NSLocalizedString("tracker_delete_confirm_message", comment: "Текст подтверждения удаления трекера"),
+            preferredStyle: .actionSheet
+        )
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("tracker_delete_confirm_delete", comment: "Кнопка подтверждения удаления трекера"),
+            style: .destructive
+        ) { [weak self] _ in
+            self?.viewModel.deleteTracker(id: trackerId)
+        })
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("tracker_delete_confirm_cancel", comment: "Кнопка отмены удаления трекера"),
+            style: .cancel
+        ))
+        present(alert, animated: true)
+    }
+
     @objc private func dateChanged() {
         viewModel.setCurrentDate(datePicker.date)
     }
@@ -280,6 +312,33 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+// MARK: - UICollectionViewDelegate
+
+extension TrackersViewController: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let tracker = viewModel.tracker(inSection: indexPath.section, row: indexPath.row) else { return nil }
+
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            let editAction = UIAction(
+                title: NSLocalizedString("tracker_context_edit", comment: "Пункт контекстного меню «Редактировать»")
+            ) { _ in
+                self?.presentEditFlow(for: tracker)
+            }
+            let deleteAction = UIAction(
+                title: NSLocalizedString("tracker_context_delete", comment: "Пункт контекстного меню «Удалить»"),
+                attributes: .destructive
+            ) { _ in
+                self?.confirmDelete(trackerId: tracker.id)
+            }
+            return UIMenu(children: [editAction, deleteAction])
+        }
+    }
+}
+
 // MARK: - TrackerCollectionViewCellDelegate
 
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
@@ -291,8 +350,8 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
 // MARK: - NewHabitViewControllerDelegate
 
 extension TrackersViewController: NewHabitViewControllerDelegate {
-    func newHabitViewController(_ viewController: NewHabitViewController, didCreate tracker: Tracker, categoryTitle: String) {
-        viewModel.addTracker(tracker, categoryTitle: categoryTitle)
+    func newHabitViewController(_ viewController: NewHabitViewController, didSave tracker: Tracker, categoryTitle: String) {
+        viewModel.saveTracker(tracker, categoryTitle: categoryTitle)
         viewController.dismiss(animated: true)
     }
 }

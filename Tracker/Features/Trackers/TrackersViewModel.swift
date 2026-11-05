@@ -99,14 +99,30 @@ final class TrackersViewModel {
         onDataChanged?(())
     }
 
-    func addTracker(_ tracker: Tracker, categoryTitle: String) {
+    func saveTracker(_ tracker: Tracker, categoryTitle: String) {
         do {
             let category = try categoryStore.categoryCoreData(withTitle: categoryTitle)
                 ?? (try categoryStore.addNewCategory(TrackerCategory(title: categoryTitle, trackers: [])))
-            try trackerStore.addNewTracker(tracker, to: category)
+            if try trackerStore.trackerCoreData(withId: tracker.id) != nil {
+                try trackerStore.updateTracker(tracker, category: category)
+            } else {
+                try trackerStore.addNewTracker(tracker, to: category)
+            }
         } catch {
             assertionFailure("Не удалось сохранить трекер: \(error)")
         }
+    }
+
+    func deleteTracker(id: UUID) {
+        do {
+            try trackerStore.deleteTracker(withId: id)
+        } catch {
+            assertionFailure("Не удалось удалить трекер: \(error)")
+        }
+    }
+
+    func categoryTitle(forTrackerId trackerId: UUID) -> String? {
+        categories.first { category in category.trackers.contains { $0.id == trackerId } }?.title
     }
 
     func toggleCompletion(trackerId: UUID) {

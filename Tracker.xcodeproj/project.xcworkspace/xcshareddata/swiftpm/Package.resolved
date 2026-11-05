@@ -1,6 +1,33 @@
 {
-  "originHash" : "09b08963887ce6eac26952e8acb25256a8ec102f2b5528ae68a97fa296723712",
+  "originHash" : "b4cc6d4abe71a481189f717b580209ca263481a333535d108780cb98a489e66b",
   "pins" : [
+    {
+      "identity" : "appmetrica-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/appmetrica/appmetrica-sdk-ios",
+      "state" : {
+        "revision" : "58fc7181cf637ed7017e6485e5c34bf11fcc607e",
+        "version" : "7.0.0"
+      }
+    },
+    {
+      "identity" : "kscrash",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kstenerud/KSCrash",
+      "state" : {
+        "revision" : "95a8895d75f3c22aa9ad9f2a15d2fbd97b0a55e2",
+        "version" : "2.5.1"
+      }
+    },
+    {
+      "identity" : "swift-protobuf",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-protobuf",
+      "state" : {
+        "revision" : "3d537cb81aef272a03cb3be815439e9bf0eb3bd3",
+        "version" : "1.39.0"
+      }
+    },
     {
       "identity" : "swift-snapshot-testing",
       "kind" : "remoteSourceControl",

@@ -27,6 +27,7 @@ final class TrackersViewController: UIViewController {
         static let filtersButtonHeight: CGFloat = 50
         static let filtersButtonCornerRadius: CGFloat = 16
         static let filtersButtonBottomInset: CGFloat = 16
+        static let analyticsScreen = "Main"
     }
 
     // MARK: - Private Properties
@@ -119,9 +120,20 @@ final class TrackersViewController: UIViewController {
         updatePlaceholderVisibility()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AnalyticsService.report(.open, screen: Constants.analyticsScreen)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        AnalyticsService.report(.close, screen: Constants.analyticsScreen)
+    }
+
     // MARK: - Actions
 
     @objc private func didTapAddButton() {
+        AnalyticsService.report(.click, screen: Constants.analyticsScreen, item: .addTrack)
         let newHabitViewController = NewHabitViewController()
         newHabitViewController.delegate = self
         let navigationController = UINavigationController(rootViewController: newHabitViewController)
@@ -129,6 +141,7 @@ final class TrackersViewController: UIViewController {
     }
 
     private func presentEditFlow(for tracker: Tracker) {
+        AnalyticsService.report(.click, screen: Constants.analyticsScreen, item: .edit)
         guard let categoryTitle = viewModel.categoryTitle(forTrackerId: tracker.id) else { return }
         let newHabitViewController = NewHabitViewController(
             categoryStore: TrackerCategoryStore(),
@@ -142,6 +155,7 @@ final class TrackersViewController: UIViewController {
     }
 
     private func confirmDelete(trackerId: UUID) {
+        AnalyticsService.report(.click, screen: Constants.analyticsScreen, item: .delete)
         let alert = UIAlertController(
             title: nil,
             message: NSLocalizedString("tracker_delete_confirm_message", comment: "Текст подтверждения удаления трекера"),
@@ -165,6 +179,7 @@ final class TrackersViewController: UIViewController {
     }
 
     @objc private func didTapFiltersButton() {
+        AnalyticsService.report(.click, screen: Constants.analyticsScreen, item: .filter)
         let filterViewController = FilterViewController(currentFilter: viewModel.currentFilter)
         filterViewController.delegate = self
         let navigationController = UINavigationController(rootViewController: filterViewController)
@@ -374,6 +389,7 @@ extension TrackersViewController: UICollectionViewDelegate {
 
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func trackerCell(_ cell: TrackerCollectionViewCell, didTapCompleteButtonFor trackerId: UUID) {
+        AnalyticsService.report(.click, screen: Constants.analyticsScreen, item: .track)
         viewModel.toggleCompletion(trackerId: trackerId)
     }
 }

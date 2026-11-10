@@ -29,11 +29,12 @@ enum AnalyticsItem: String {
 
 enum AnalyticsService {
 
-    // TODO: заменить на реальный API-ключ приложения из личного кабинета AppMetrica (metrica.yandex.ru) перед сдачей.
-    private static let apiKey = "00000000-0000-0000-0000-000000000000"
-
     static func activate() {
-        guard let configuration = AppMetricaConfiguration(apiKey: apiKey) else { return }
+        guard
+            let apiKey = Bundle.main.object(forInfoDictionaryKey: "APPMETRICA_API_KEY") as? String,
+            !apiKey.isEmpty,
+            let configuration = AppMetricaConfiguration(apiKey: apiKey)
+        else { return }
         AppMetrica.activate(with: configuration)
     }
 

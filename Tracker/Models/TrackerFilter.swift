@@ -15,14 +15,10 @@ enum TrackerFilter: Int, CaseIterable {
 
     var title: String {
         switch self {
-        case .all:
-            return NSLocalizedString("filter_all", comment: "Фильтр «Все трекеры»")
-        case .today:
-            return NSLocalizedString("filter_today", comment: "Фильтр «Трекеры на сегодня»")
-        case .completed:
-            return NSLocalizedString("filter_completed", comment: "Фильтр «Завершённые»")
-        case .incomplete:
-            return NSLocalizedString("filter_incomplete", comment: "Фильтр «Незавершённые»")
+        case .all: NSLocalizedString("filter_all", comment: "Фильтр «Все трекеры»")
+        case .today: NSLocalizedString("filter_today", comment: "Фильтр «Трекеры на сегодня»")
+        case .completed: NSLocalizedString("filter_completed", comment: "Фильтр «Завершённые»")
+        case .incomplete: NSLocalizedString("filter_incomplete", comment: "Фильтр «Незавершённые»")
         }
     }
 

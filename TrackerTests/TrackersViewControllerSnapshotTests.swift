@@ -12,28 +12,37 @@ import SnapshotTesting
 @MainActor
 final class TrackersViewControllerSnapshotTests: XCTestCase {
 
+    // MARK: - Private Properties
+
+    private var sut: TrackersViewController!
+
+    // MARK: - Setup
+
     override func setUp() {
         super.setUp()
         removeAllTrackers()
+        sut = TrackersViewController()
+        sut.loadViewIfNeeded()
+        sut.view.frame = UIScreen.main.bounds
+        sut.view.layoutIfNeeded()
     }
 
+    override func tearDown() {
+        sut = nil
+        super.tearDown()
+    }
+
+    // MARK: - Tests
+
     func testMainScreenLight() {
-        assertSnapshot(matching: makeViewController(), as: .image(traits: .init(userInterfaceStyle: .light)))
+        assertSnapshot(matching: sut, as: .image(traits: .init(userInterfaceStyle: .light)))
     }
 
     func testMainScreenDark() {
-        assertSnapshot(matching: makeViewController(), as: .image(traits: .init(userInterfaceStyle: .dark)))
+        assertSnapshot(matching: sut, as: .image(traits: .init(userInterfaceStyle: .dark)))
     }
 
     // MARK: - Private Methods
-
-    private func makeViewController() -> UIViewController {
-        let viewController = TrackersViewController()
-        viewController.loadViewIfNeeded()
-        viewController.view.frame = UIScreen.main.bounds
-        viewController.view.layoutIfNeeded()
-        return viewController
-    }
 
     /// Очищаем персистентное хранилище перед каждым тестом,
     /// чтобы снимок главного экрана был детерминирован (пустое состояние).

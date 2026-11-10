@@ -9,6 +9,12 @@ import Foundation
 
 final class TrackersViewModel {
 
+    // MARK: - Constants
+
+    private enum Constants {
+        static let selectedFilterKey = "selectedTrackerFilter"
+    }
+
     // MARK: - Bindings
 
     var onDataChanged: Binding<Void>?
@@ -24,8 +30,11 @@ final class TrackersViewModel {
     var isSearchActive: Bool { !searchText.isEmpty }
     var isFilteringActive: Bool { isSearchActive || currentFilter == .completed || currentFilter == .incomplete }
 
-    private(set) var currentFilter: TrackerFilter = .all {
-        didSet { onDataChanged?(()) }
+    private(set) var currentFilter: TrackerFilter {
+        didSet {
+            UserDefaults.standard.set(currentFilter.rawValue, forKey: Constants.selectedFilterKey)
+            onDataChanged?(())
+        }
     }
 
     var isFilterButtonVisible: Bool {
@@ -82,6 +91,8 @@ final class TrackersViewModel {
         self.categoryStore = categoryStore
         self.trackerStore = trackerStore
         self.recordStore = recordStore
+        let storedFilterValue = UserDefaults.standard.object(forKey: Constants.selectedFilterKey) as? Int
+        self.currentFilter = storedFilterValue.flatMap(TrackerFilter.init(rawValue:)) ?? .all
         self.categoryStore.delegate = self
         self.recordStore.delegate = self
         reloadFromStores()

@@ -7,26 +7,6 @@
 
 import AppMetricaCore
 
-// MARK: - AnalyticsEvent
-
-enum AnalyticsEvent: String {
-    case open
-    case close
-    case click
-}
-
-// MARK: - AnalyticsItem
-
-enum AnalyticsItem: String {
-    case addTrack = "add_track"
-    case track
-    case filter
-    case edit
-    case delete
-}
-
-// MARK: - AnalyticsService
-
 enum AnalyticsService {
 
     static func activate() {
@@ -38,8 +18,8 @@ enum AnalyticsService {
         AppMetrica.activate(with: configuration)
     }
 
-    static func report(_ event: AnalyticsEvent, screen: String, item: AnalyticsItem? = nil) {
-        var parameters: [String: Any] = ["event": event.rawValue, "screen": screen]
+    static func report(_ event: AnalyticsEvent, screen: AnalyticsScreen, item: AnalyticsItem? = nil) {
+        var parameters: [String: Any] = ["event": event.rawValue, "screen": screen.rawValue]
         if let item {
             parameters["item"] = item.rawValue
         }

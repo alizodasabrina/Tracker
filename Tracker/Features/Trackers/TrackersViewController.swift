@@ -27,7 +27,7 @@ final class TrackersViewController: UIViewController {
         static let filtersButtonHeight: CGFloat = 50
         static let filtersButtonCornerRadius: CGFloat = 16
         static let filtersButtonBottomInset: CGFloat = 16
-        static let analyticsScreen = "Main"
+        static let analyticsScreen: AnalyticsScreen = .main
     }
 
     // MARK: - Private Properties

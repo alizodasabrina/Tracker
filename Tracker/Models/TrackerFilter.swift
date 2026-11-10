@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TrackerFilter: CaseIterable {
+enum TrackerFilter: Int, CaseIterable {
     case all
     case today
     case completed

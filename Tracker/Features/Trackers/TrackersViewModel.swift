@@ -9,12 +9,6 @@ import Foundation
 
 final class TrackersViewModel {
 
-    // MARK: - Constants
-
-    private enum Constants {
-        static let selectedFilterKey = "selectedTrackerFilter"
-    }
-
     // MARK: - Bindings
 
     var onDataChanged: Binding<Void>?
@@ -32,7 +26,7 @@ final class TrackersViewModel {
 
     private(set) var currentFilter: TrackerFilter {
         didSet {
-            UserDefaults.standard.set(currentFilter.rawValue, forKey: Constants.selectedFilterKey)
+            UserDefaultsService.shared.selectedTrackerFilterRawValue = currentFilter.rawValue
             onDataChanged?(())
         }
     }
@@ -91,7 +85,7 @@ final class TrackersViewModel {
         self.categoryStore = categoryStore
         self.trackerStore = trackerStore
         self.recordStore = recordStore
-        let storedFilterValue = UserDefaults.standard.object(forKey: Constants.selectedFilterKey) as? Int
+        let storedFilterValue = UserDefaultsService.shared.selectedTrackerFilterRawValue
         self.currentFilter = storedFilterValue.flatMap(TrackerFilter.init(rawValue:)) ?? .all
         self.categoryStore.delegate = self
         self.recordStore.delegate = self

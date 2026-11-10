@@ -25,7 +25,7 @@ final class TabBarController: UITabBarController {
         )
         let trackersNavigationController = UINavigationController(rootViewController: trackersViewController)
 
-        let statisticsViewController = StatisticsViewController()
+        let statisticsViewController = StatisticsViewController(viewModel: StatisticsViewModel(recordStore: TrackerRecordStore()))
         statisticsViewController.tabBarItem = UITabBarItem(
             title: NSLocalizedString("tab_statistics", comment: "Название вкладки со статистикой"),
             image: UIImage(resource: .tabStatistics).withTintColor(unselectedColor, renderingMode: .alwaysOriginal),

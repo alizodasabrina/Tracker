@@ -23,7 +23,19 @@ final class StatisticsViewController: UIViewController {
 
     // MARK: - Private Properties
 
-    private let viewModel = StatisticsViewModel(recordStore: TrackerRecordStore())
+    private let viewModel: StatisticsViewModel
+
+    // MARK: - Init
+
+    init(viewModel: StatisticsViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        nil
+    }
 
     // MARK: - Subviews
 

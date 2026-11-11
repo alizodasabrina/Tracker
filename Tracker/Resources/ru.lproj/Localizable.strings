@@ -1,0 +1,68 @@
+/* Онбординг */
+"onboarding_page1_title" = "Отслеживайте только то, что хотите";
+"onboarding_page2_title" = "Даже если это не литры воды и йога";
+"onboarding_continue_button" = "Вот это технологии!";
+
+/* Таб-бар */
+"tab_trackers" = "Трекеры";
+"tab_statistics" = "Статистика";
+
+/* Главный экран */
+"trackers_search_placeholder" = "Поиск";
+"trackers_empty_placeholder" = "Что будем отслеживать?";
+"trackers_no_results_placeholder" = "Ничего не найдено";
+"tracker_context_edit" = "Редактировать";
+"tracker_context_delete" = "Удалить";
+"tracker_delete_confirm_message" = "Уверены что хотите удалить трекер?";
+"tracker_delete_confirm_delete" = "Удалить";
+"tracker_delete_confirm_cancel" = "Отменить";
+"filters_title" = "Фильтры";
+"filter_all" = "Все трекеры";
+"filter_today" = "Трекеры на сегодня";
+"filter_completed" = "Завершённые";
+"filter_incomplete" = "Незавершённые";
+
+/* Общие строки формы привычки/категории */
+"option_category" = "Категория";
+"option_schedule" = "Расписание";
+
+/* Новая привычка */
+"new_habit_title" = "Новая привычка";
+"new_habit_name_placeholder" = "Введите название трекера";
+"new_habit_name_warning" = "Ограничение 38 символов";
+"new_habit_emoji_title" = "Emoji";
+"new_habit_color_title" = "Цвет";
+"new_habit_cancel_button" = "Отменить";
+"new_habit_create_button" = "Создать";
+
+/* Расписание */
+"schedule_done_button" = "Готово";
+"schedule_every_day" = "Каждый день";
+
+/* Категория */
+"category_title" = "Категория";
+"category_add_button" = "Добавить категорию";
+"category_empty_placeholder" = "Привычки и события можно\nобъединить по смыслу";
+
+/* Новая категория */
+"new_category_title" = "Новая категория";
+"new_category_name_placeholder" = "Введите название категории";
+"new_category_done_button" = "Готово";
+
+/* Дни недели: полное название */
+"weekday_monday_full" = "Понедельник";
+"weekday_tuesday_full" = "Вторник";
+"weekday_wednesday_full" = "Среда";
+"weekday_thursday_full" = "Четверг";
+"weekday_friday_full" = "Пятница";
+"weekday_saturday_full" = "Суббота";
+"weekday_sunday_full" = "Воскресенье";
+
+/* Дни недели: короткое название */
+"weekday_monday_short" = "Пн";
+"weekday_tuesday_short" = "Вт";
+"weekday_wednesday_short" = "Ср";
+"weekday_thursday_short" = "Чт";
+"weekday_friday_short" = "Пт";
+"weekday_saturday_short" = "Сб";
+"weekday_sunday_short" = "Вс";

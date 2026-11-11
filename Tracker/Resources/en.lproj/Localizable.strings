@@ -1,0 +1,7 @@
+/* Главный экран (единственный экран с английской локализацией в этом спринте) */
+"tab_trackers" = "Trackers";
+"tab_statistics" = "Statistics";
+"filters_title" = "Filters";
+"trackers_search_placeholder" = "Search";
+"trackers_empty_placeholder" = "What will we track?";
+"trackers_no_results_placeholder" = "Nothing found";

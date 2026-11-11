@@ -22,6 +22,19 @@ final class TrackersViewModel {
     var sectionsCount: Int { visibleCategories.count }
     var isEmpty: Bool { visibleCategories.isEmpty }
     var isSearchActive: Bool { !searchText.isEmpty }
+    var isFilteringActive: Bool { isSearchActive || currentFilter == .completed || currentFilter == .incomplete }
+
+    private(set) var currentFilter: TrackerFilter {
+        didSet {
+            UserDefaultsService.shared.selectedTrackerFilterRawValue = currentFilter.rawValue
+            onDataChanged?(())
+        }
+    }
+
+    var isFilterButtonVisible: Bool {
+        guard let weekDay = WeekDay(rawValue: Calendar.current.component(.weekday, from: currentDate)) else { return false }
+        return categories.contains { category in category.trackers.contains { $0.schedule.contains(weekDay) } }
+    }
 
     var isCompletionEnabled: Bool {
         Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) != .orderedDescending
@@ -51,7 +64,16 @@ final class TrackersViewModel {
                 let matchesSchedule = tracker.schedule.contains(weekDay)
                 let matchesSearch = searchText.isEmpty
                     || tracker.title.localizedCaseInsensitiveContains(searchText)
-                return matchesSchedule && matchesSearch
+                let matchesFilter: Bool
+                switch currentFilter {
+                case .all, .today:
+                    matchesFilter = true
+                case .completed:
+                    matchesFilter = isCompletedToday(trackerId: tracker.id)
+                case .incomplete:
+                    matchesFilter = !isCompletedToday(trackerId: tracker.id)
+                }
+                return matchesSchedule && matchesSearch && matchesFilter
             }
             return trackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: trackers)
         }
@@ -63,6 +85,8 @@ final class TrackersViewModel {
         self.categoryStore = categoryStore
         self.trackerStore = trackerStore
         self.recordStore = recordStore
+        let storedFilterValue = UserDefaultsService.shared.selectedTrackerFilterRawValue
+        self.currentFilter = storedFilterValue.flatMap(TrackerFilter.init(rawValue:)) ?? .all
         self.categoryStore.delegate = self
         self.recordStore.delegate = self
         reloadFromStores()
@@ -99,14 +123,40 @@ final class TrackersViewModel {
         onDataChanged?(())
     }
 
-    func addTracker(_ tracker: Tracker, categoryTitle: String) {
+    func setFilter(_ filter: TrackerFilter) {
+        switch filter {
+        case .today:
+            currentFilter = .all
+            currentDate = Date()
+        case .all, .completed, .incomplete:
+            currentFilter = filter
+        }
+    }
+
+    func saveTracker(_ tracker: Tracker, categoryTitle: String) {
         do {
             let category = try categoryStore.categoryCoreData(withTitle: categoryTitle)
                 ?? (try categoryStore.addNewCategory(TrackerCategory(title: categoryTitle, trackers: [])))
-            try trackerStore.addNewTracker(tracker, to: category)
+            if try trackerStore.trackerCoreData(withId: tracker.id) != nil {
+                try trackerStore.updateTracker(tracker, category: category)
+            } else {
+                try trackerStore.addNewTracker(tracker, to: category)
+            }
         } catch {
             assertionFailure("Не удалось сохранить трекер: \(error)")
         }
+    }
+
+    func deleteTracker(id: UUID) {
+        do {
+            try trackerStore.deleteTracker(withId: id)
+        } catch {
+            assertionFailure("Не удалось удалить трекер: \(error)")
+        }
+    }
+
+    func categoryTitle(forTrackerId trackerId: UUID) -> String? {
+        categories.first { category in category.trackers.contains { $0.id == trackerId } }?.title
     }
 
     func toggleCompletion(trackerId: UUID) {

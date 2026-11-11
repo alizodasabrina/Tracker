@@ -80,7 +80,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     private lazy var counterLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: Constants.counterFontSize, weight: .medium)
-        label.textColor = UIColor(resource: .ypBlack)
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -139,19 +139,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     // MARK: - Private Methods
 
     private func daysString(for count: Int) -> String {
-        let remainder100 = count % 100
-        let remainder10 = count % 10
-        let word: String
-        if remainder100 >= 11 && remainder100 <= 14 {
-            word = "дней"
-        } else if remainder10 == 1 {
-            word = "день"
-        } else if remainder10 >= 2 && remainder10 <= 4 {
-            word = "дня"
-        } else {
-            word = "дней"
-        }
-        return "\(count) \(word)"
+        String.localizedStringWithFormat(
+            NSLocalizedString("tracker_days_count", comment: "Количество дней выполнения трекера"),
+            count
+        )
     }
 
     private func setupView() {

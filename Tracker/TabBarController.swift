@@ -19,20 +19,21 @@ final class TabBarController: UITabBarController {
 
         let trackersViewController = TrackersViewController()
         trackersViewController.tabBarItem = UITabBarItem(
-            title: "Трекеры",
+            title: NSLocalizedString("tab_trackers", comment: "Название вкладки с трекерами"),
             image: UIImage(systemName: "record.circle.fill")?.withTintColor(unselectedColor, renderingMode: .alwaysOriginal),
             selectedImage: UIImage(systemName: "record.circle.fill")?.withTintColor(selectedColor, renderingMode: .alwaysOriginal)
         )
         let trackersNavigationController = UINavigationController(rootViewController: trackersViewController)
 
-        let statisticsViewController = StatisticsViewController()
+        let statisticsViewController = StatisticsViewController(viewModel: StatisticsViewModel(recordStore: TrackerRecordStore()))
         statisticsViewController.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: NSLocalizedString("tab_statistics", comment: "Название вкладки со статистикой"),
             image: UIImage(resource: .tabStatistics).withTintColor(unselectedColor, renderingMode: .alwaysOriginal),
             selectedImage: UIImage(resource: .tabStatistics).withTintColor(selectedColor, renderingMode: .alwaysOriginal)
         )
+        let statisticsNavigationController = UINavigationController(rootViewController: statisticsViewController)
 
-        viewControllers = [trackersNavigationController, statisticsViewController]
+        viewControllers = [trackersNavigationController, statisticsNavigationController]
 
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()

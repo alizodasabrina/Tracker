@@ -53,7 +53,7 @@ final class ScheduleViewController: UIViewController {
 
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("schedule_done_button", comment: "Кнопка сохранения расписания"), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(resource: .ypBlack)
@@ -81,7 +81,7 @@ final class ScheduleViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .white
-        title = "Расписание"
+        title = NSLocalizedString("option_schedule", comment: "Заголовок экрана расписания")
         setupView()
         setupConstraints()
     }

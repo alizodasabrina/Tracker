@@ -19,25 +19,25 @@ enum WeekDay: Int, CaseIterable, Codable {
 
     var title: String {
         switch self {
-        case .monday: "Понедельник"
-        case .tuesday: "Вторник"
-        case .wednesday: "Среда"
-        case .thursday: "Четверг"
-        case .friday: "Пятница"
-        case .saturday: "Суббота"
-        case .sunday: "Воскресенье"
+        case .monday: NSLocalizedString("weekday_monday_full", comment: "Понедельник, полное название")
+        case .tuesday: NSLocalizedString("weekday_tuesday_full", comment: "Вторник, полное название")
+        case .wednesday: NSLocalizedString("weekday_wednesday_full", comment: "Среда, полное название")
+        case .thursday: NSLocalizedString("weekday_thursday_full", comment: "Четверг, полное название")
+        case .friday: NSLocalizedString("weekday_friday_full", comment: "Пятница, полное название")
+        case .saturday: NSLocalizedString("weekday_saturday_full", comment: "Суббота, полное название")
+        case .sunday: NSLocalizedString("weekday_sunday_full", comment: "Воскресенье, полное название")
         }
     }
 
     var shortTitle: String {
         switch self {
-        case .monday: "Пн"
-        case .tuesday: "Вт"
-        case .wednesday: "Ср"
-        case .thursday: "Чт"
-        case .friday: "Пт"
-        case .saturday: "Сб"
-        case .sunday: "Вс"
+        case .monday: NSLocalizedString("weekday_monday_short", comment: "Понедельник, сокращение")
+        case .tuesday: NSLocalizedString("weekday_tuesday_short", comment: "Вторник, сокращение")
+        case .wednesday: NSLocalizedString("weekday_wednesday_short", comment: "Среда, сокращение")
+        case .thursday: NSLocalizedString("weekday_thursday_short", comment: "Четверг, сокращение")
+        case .friday: NSLocalizedString("weekday_friday_short", comment: "Пятница, сокращение")
+        case .saturday: NSLocalizedString("weekday_saturday_short", comment: "Суббота, сокращение")
+        case .sunday: NSLocalizedString("weekday_sunday_short", comment: "Воскресенье, сокращение")
         }
     }
 }

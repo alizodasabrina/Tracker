@@ -71,6 +71,22 @@ final class TrackerStore: NSObject {
         return try context.fetch(request).first
     }
 
+    func updateTracker(_ tracker: Tracker, category: TrackerCategoryCoreData) throws {
+        guard let trackerCoreData = try trackerCoreData(withId: tracker.id) else { return }
+        trackerCoreData.title = tracker.title
+        trackerCoreData.emoji = tracker.emoji
+        trackerCoreData.colorHex = UIColorMarshalling.hexString(from: tracker.color)
+        trackerCoreData.setValue(tracker.schedule, forKey: "schedule")
+        trackerCoreData.category = category
+        try context.save()
+    }
+
+    func deleteTracker(withId id: UUID) throws {
+        guard let trackerCoreData = try trackerCoreData(withId: id) else { return }
+        context.delete(trackerCoreData)
+        try context.save()
+    }
+
     static func tracker(from trackerCoreData: TrackerCoreData) -> Tracker? {
         guard let id = trackerCoreData.id,
               let title = trackerCoreData.title,
